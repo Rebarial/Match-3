@@ -80,9 +80,9 @@ public static class GameObjectFactory
         {
             CheckDestroy();
             bonusGameObjects.Clear();
+            if (dieGameObjects.Any()) StartDestroy(tickCounter);
             if (linesActive.Any()) 
                 StartLineDetonation(tickCounter);
-            if (dieGameObjects.Any()) StartDestroy(tickCounter);
             if (bombInGame) StartBomb(tickCounter);
         }
         if (State == GameState.Destroying) DestroyObject(tickCounter);
