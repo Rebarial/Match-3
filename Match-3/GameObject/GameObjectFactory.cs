@@ -286,7 +286,7 @@ public static class GameObjectFactory
     
     private static bool checkCoordInLine(int coord, int coordEndLine, int lineSize)
     {
-        return coordEndLine - lineSize <= coord && coord <= coordEndLine;
+        return coordEndLine - lineSize + 1 <= coord && coord <= coordEndLine;
     }
 
     private static GameObjectClass selectedObject;
@@ -337,6 +337,9 @@ public static class GameObjectFactory
                     new BonusData { ElementToBonus = selectedObject, IsHorizontalBonus = false, IsVerticalBonus = false, IsHorizontalLineDestroy = false, IsVerticalLineDestroy = false}
                 };
                 
+                (targetObjectX, targetObjectY) = targetObject.GetCoords();
+                (selectedObjectX, selectedObjectY) = selectedObject.GetCoords();
+                
                 if (bonusGameObjects.Any())
                 {
                     foreach (var bonus in bonusGameObjects)
@@ -346,18 +349,6 @@ public static class GameObjectFactory
                             if (checkCoordInLine(targetObjectX, bonus.x, bonus.size)
                                 && bonus.y == targetObjectY)
                             {
-                                if (bonus.size == 4) bonusStructureData[1].IsHorizontalBonus = true;
-                                else if (bonus.size >= 5)
-                                {
-                                    bonusStructureData[1].IsHorizontalLineDestroy = true; //для условия бомбы
-                                    bonusStructureData[1].IsVerticalLineDestroy = true;
-                                }
-                                bonusStructureData[1].IsHorizontalLineDestroy = true;
-                            }
-
-                            if (checkCoordInLine(selectedObjectX, bonus.x, bonus.size)
-                                && bonus.y == selectedObjectY)
-                            {
                                 if (bonus.size == 4) bonusStructureData[0].IsHorizontalBonus = true;
                                 else if (bonus.size >= 5)
                                 {
@@ -366,23 +357,23 @@ public static class GameObjectFactory
                                 }
                                 bonusStructureData[0].IsHorizontalLineDestroy = true;
                             }
-                        }
-                        else if (bonus.orientation_type == OrientationTypeDict["vertical"])
-                        {
-                            if (checkCoordInLine(targetObjectY, bonus.y, bonus.size)
-                                && bonus.x == targetObjectX)
+
+                            if (checkCoordInLine(selectedObjectX, bonus.x, bonus.size)
+                                && bonus.y == selectedObjectY)
                             {
-                                if (bonus.size == 4) bonusStructureData[1].IsVerticalBonus = true;
+                                if (bonus.size == 4) bonusStructureData[1].IsHorizontalBonus = true;
                                 else if (bonus.size >= 5)
                                 {
                                     bonusStructureData[1].IsHorizontalLineDestroy = true; //для условия бомбы
                                     bonusStructureData[1].IsVerticalLineDestroy = true;
                                 }
-                                bonusStructureData[1].IsVerticalLineDestroy = true;
+                                bonusStructureData[1].IsHorizontalLineDestroy = true;
                             }
-
-                            if (checkCoordInLine(selectedObjectY, bonus.y, bonus.size)
-                                && bonus.x == selectedObjectX)
+                        }
+                        else if (bonus.orientation_type == OrientationTypeDict["vertical"])
+                        {
+                            if (checkCoordInLine(targetObjectY, bonus.y, bonus.size)
+                                && bonus.x == targetObjectX)
                             {
                                 if (bonus.size == 4) bonusStructureData[0].IsVerticalBonus = true;
                                 else if (bonus.size >= 5)
@@ -391,6 +382,18 @@ public static class GameObjectFactory
                                     bonusStructureData[0].IsVerticalLineDestroy = true;
                                 }
                                 bonusStructureData[0].IsVerticalLineDestroy = true;
+                            }
+
+                            if (checkCoordInLine(selectedObjectY, bonus.y, bonus.size)
+                                && bonus.x == selectedObjectX)
+                            {
+                                if (bonus.size == 4) bonusStructureData[1].IsVerticalBonus = true;
+                                else if (bonus.size >= 5)
+                                {
+                                    bonusStructureData[1].IsHorizontalLineDestroy = true; //для условия бомбы
+                                    bonusStructureData[1].IsVerticalLineDestroy = true;
+                                }
+                                bonusStructureData[1].IsVerticalLineDestroy = true;
                             }
                         }
                     }
