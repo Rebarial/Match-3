@@ -1,0 +1,102 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <RootNamespace>Match_3</RootNamespace>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="GameObject\Sprites\blue\rune_blue_h.png" />
+      <EmbeddedResource Include="GameObject\Sprites\blue\rune_blue_h.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\blue\rune_blue_n.png" />
+      <EmbeddedResource Include="GameObject\Sprites\blue\rune_blue_hl.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="GameObject\Sprites\blue\rune_blue_n.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\blue\rune_blue_v.png" />
+      <EmbeddedResource Include="GameObject\Sprites\blue\rune_blue_v.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\blue\rune_blue_x.png" />
+      <EmbeddedResource Include="GameObject\Sprites\blue\rune_blue_x.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\green\rune_green_h.png" />
+      <EmbeddedResource Include="GameObject\Sprites\green\rune_green_h.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\green\rune_green_n.png" />
+      <EmbeddedResource Include="GameObject\Sprites\green\rune_green_n.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\green\rune_green_v.png" />
+      <EmbeddedResource Include="GameObject\Sprites\green\rune_green_v.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\green\rune_green_x.png" />
+      <EmbeddedResource Include="GameObject\Sprites\green\rune_green_x.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\orange\rune_orange_h.png" />
+      <EmbeddedResource Include="GameObject\Sprites\orange\rune_orange_h.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\orange\rune_orange_n.png" />
+      <EmbeddedResource Include="GameObject\Sprites\orange\rune_orange_n.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\orange\rune_orange_v.png" />
+      <EmbeddedResource Include="GameObject\Sprites\orange\rune_orange_v.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\orange\rune_orange_x.png" />
+      <EmbeddedResource Include="GameObject\Sprites\orange\rune_orange_x.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\pink\rune_pink_h.png" />
+      <EmbeddedResource Include="GameObject\Sprites\pink\rune_pink_h.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\pink\rune_pink_n.png" />
+      <EmbeddedResource Include="GameObject\Sprites\pink\rune_pink_n.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\pink\rune_pink_v.png" />
+      <EmbeddedResource Include="GameObject\Sprites\pink\rune_pink_v.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\pink\rune_pink_x.png" />
+      <EmbeddedResource Include="GameObject\Sprites\pink\rune_pink_x.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\red\rune_red_h.png" />
+      <EmbeddedResource Include="GameObject\Sprites\red\rune_red_h.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\red\rune_red_n.png" />
+      <EmbeddedResource Include="GameObject\Sprites\red\rune_red_n.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\red\rune_red_v.png" />
+      <EmbeddedResource Include="GameObject\Sprites\red\rune_red_v.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\red\rune_red_x.png" />
+      <EmbeddedResource Include="GameObject\Sprites\red\rune_red_x.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="GameObject\Sprites\bonuses\bomb.png" />
+      <EmbeddedResource Include="GameObject\Sprites\bonuses\bomb.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
+</Project>

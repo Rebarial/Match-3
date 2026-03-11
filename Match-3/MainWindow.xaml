@@ -1,0 +1,22 @@
+﻿<Window x:Class="Match_3.MainWindow"
+        WindowStartupLocation="CenterScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Match_3"
+        mc:Ignorable="d"
+        Title="Match-3 Main menu" Height="100" Width="200">
+    <Grid>
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Label x:Name="MainMenuLabel">Match-3</Label>
+            <Button
+                x:Name="PlayButton"
+                Cursor="Hand"
+                Click="PlayButton_OnClick"
+                >
+                Play
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>
