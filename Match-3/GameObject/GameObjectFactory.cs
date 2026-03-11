@@ -233,9 +233,9 @@ public static class GameObjectFactory
                 var (x, y) = bomb.GetCoords();
                 
                 int startX = Math.Max(0, x - 1);
-                int endX = Math.Min(7, x + 1);
+                int endX = Math.Min(GameConfig.BoardSize-1, x + 1);
                 int startY = Math.Max(0, y - 1);
-                int endY = Math.Min(7, y + 1);
+                int endY = Math.Min(GameConfig.BoardSize-1, y + 1);
                 
                 for (int i = startX; i <= endX; i++)
                 {
@@ -574,9 +574,9 @@ public static class GameObjectFactory
     }
 
     private static double scale = 1;
-    private static void DestroyObject(int tickCouner)
+    private static void DestroyObject(int tickCounter)
     {
-        if (tickCouner % (MyMathHelper.OneSecTicks(GameConfig.GameLoopIntervalMs)/20) == 0)
+        if (tickCounter % (MyMathHelper.OneSecTicks(GameConfig.GameLoopIntervalMs)/20) == 0)
         {
             if (!dieGameObjects.Any())
             {
@@ -593,7 +593,7 @@ public static class GameObjectFactory
             
         }
 
-        if (tickCouner >= tickAnimationEnd)
+        if (tickCounter >= tickAnimationEnd)
         {
             tickAnimationEnd = -1;
             scale = 1;
