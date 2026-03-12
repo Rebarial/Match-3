@@ -2,16 +2,16 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Match_3.Tools;
 using Match_3.GameObject;
+using Match_3.Tools;
 
 namespace Match_3;
 
-
 public partial class Game : Window
 {
-    bool gameStarted = false;
-    private DispatcherTimer gameTimer = new DispatcherTimer();
+    private bool gameStarted;
+    private DispatcherTimer gameTimer = new();
+
     public Game()
     {
         InitializeComponent();
@@ -19,7 +19,6 @@ public partial class Game : Window
         StartGame();
     }
 
-    
 
     private void InitGame()
     {
@@ -28,97 +27,94 @@ public partial class Game : Window
         GameConfig.StartTimerSpeed = MyMathHelper.OneSecTicks(GameConfig.GameLoopIntervalMs) / 2;
 
         GameConfig.TicksLimit = 100001;
-        
-        Canvas gameCanvas = new Canvas();
+
+        var gameCanvas = new Canvas();
         gameCanvas.Background = Brushes.LightGray;
         gameCanvas.Width = 400;
         gameCanvas.Height = 400;
-        
+
         GameConfig.CellSize = 60;
         GameConfig.BoardSize = 8;
         GameArea.Children.Add(GameObjectFactory.GenerateDesk());
         Grid.SetZIndex(CenterStackPanel, 10);
-        //var go1 = GameObjectFactory.CreateGameObjectByIndexType(1, 20, 20);
-        //CenterStackPanel.Children.Add(go1.GetElement());
     }
-    
-    
+
+
     private void StartGame()
     {
-        gameTimer = new DispatcherTimer()
+        gameTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(GameConfig.GameLoopIntervalMs) 
+            Interval = TimeSpan.FromMilliseconds(GameConfig.GameLoopIntervalMs)
         };
 
         gameTimer.Tick += Update;
         gameTimer.Start();
     }
 
-    private int tickCouner = 0;
+    private int tickCounter;
     private int timeOfGameLeft = 60;
-    
+
     public static int Score = 0;
-    
+
     private void Update(object sender, EventArgs e)
     {
         if (!gameStarted)
         {
-            if (tickCouner % GameConfig.StartTimerSpeed == 0 && tickCouner != 0)
+            if (tickCounter % GameConfig.StartTimerSpeed == 0 && tickCounter != 0)
             {
                 GameConfig.TimerUntilStart--;
                 if (GameConfig.TimerUntilStart >= 0)
                 {
                     BigTimerToStart.FontSize = 20;
-                    string labelText = $"{GameConfig.TimerUntilStart}!";
+                    var labelText = $"{GameConfig.TimerUntilStart}!";
                     if (GameConfig.TimerUntilStart == 0) labelText = "Go!";
                     BigTimerToStart.Content = labelText;
                 }
                 else
                 {
-                    this.CenterStackPanel.Children.Remove(BigTimerToStart);
+                    CenterStackPanel.Children.Remove(BigTimerToStart);
                     BigTimerToStart = null;
                     gameStarted = true;
                 }
-
             }
             else
             {
-                int fontSizeUpSpeed = 40 / GameConfig.StartTimerSpeed;
+                var fontSizeUpSpeed = 40 / GameConfig.StartTimerSpeed;
                 BigTimerToStart.FontSize = BigTimerToStart.FontSize + fontSizeUpSpeed;
             }
-            
         }
-        else 
+        else
         {
-            if (tickCouner % MyMathHelper.OneSecTicks(GameConfig.GameLoopIntervalMs) == 0)
+            if (tickCounter % MyMathHelper.OneSecTicks(GameConfig.GameLoopIntervalMs) == 0)
             {
                 timeOfGameLeft--;
                 TimerText.Text = timeOfGameLeft.ToString();
                 if (timeOfGameLeft <= 0)
                 {
-                    gameTimer.Stop(); 
-                    ShowGameOver(); 
+                    gameTimer.Stop();
+                    ShowGameOver();
                 }
             }
-            
+
             ScoreText.Text = Score.ToString();
 
-            GameObjectFactory.DeskController(tickCouner);
+            GameObjectFactory.DeskController(tickCounter);
         }
-        tickCouner++;
-        if (tickCouner >= GameConfig.TicksLimit) tickCouner = 1;
+
+        tickCounter++;
+        if (tickCounter >= GameConfig.TicksLimit) tickCounter = 1;
     }
-    
+
     private void ShowGameOver()
     {
-        MessageBox.Show($"Game Over!\n\nВаш счёт: {Score}", 
-            "Game Over", 
-            MessageBoxButton.OK, 
+        MessageBox.Show($"Game Over!\n\nВаш счёт: {Score}",
+            "Game Over",
+            MessageBoxButton.OK,
             MessageBoxImage.Information);
-        
-        MainWindow mainWindow = new MainWindow();
+
+        var mainWindow = new MainWindow();
         mainWindow.Show();
-        
-        this.Close();
+
+        Close();
     }
 }
