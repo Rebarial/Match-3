@@ -17,9 +17,30 @@ public class BonusData
 
     public bool IsHorizontalLineDestroy { get; set; }
     
+    public List<CheckBonusGameObjects> UsingCheckBonusGameObjects { get; set; }
+    
     public BonusData(GameObjectClass elementToBonus)
     {
         ElementToBonus = elementToBonus;
+        UsingCheckBonusGameObjects = new List<CheckBonusGameObjects>();
+    }
+}
+
+public class CheckBonusGameObjects
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+    public int Size { get; set; }
+    public int Orientation_type { get; set; }
+    public int Element_type { get; set; }
+
+    public CheckBonusGameObjects(int x, int y, int size, int orientation_type, int element_type)
+    {
+        X = x;
+        Y = y;
+        Size = size;
+        Orientation_type = orientation_type;
+        Element_type = element_type;
     }
 }
 
@@ -29,7 +50,7 @@ public static class GameObjectFactory
     private static GameObjectClass[,] gameObjectBoard;
     private static int[,] intBoard; //Столбец, Строка
     private static List<GameObjectClass> dieGameObjects;
-    private static List<(int x, int y, int size, int orientation_type, int element_type)> bonusGameObjects;
+    private static List<CheckBonusGameObjects> checkBonusGameObjects;
 
     public static Dictionary<string, int> OrientationTypeDict = new() { { "horizontal", 0 }, { "vertical", 1 } };
 
@@ -39,7 +60,7 @@ public static class GameObjectFactory
     {
         State = GameState.Idle;
         dieGameObjects = new List<GameObjectClass>();
-        bonusGameObjects = new List<(int x, int y, int size, int orientation_type, int element_type)>();
+        checkBonusGameObjects = new List<CheckBonusGameObjects>();
 
         var size = GameConfig.BoardSize;
 
@@ -66,7 +87,7 @@ public static class GameObjectFactory
         Destroying = 1,
         Dropping = 2,
         Swapping = 3,
-        AfterSwap = 4,
+        AfterAction = 4,
         BombAnimating = 5,
         LineDetonation = 6
     }
@@ -78,16 +99,24 @@ public static class GameObjectFactory
         if (State == GameState.Idle)
         {
             CheckDestroy();
-            bonusGameObjects.Clear();
+            checkBonusGameObjects.Clear();
+            if (linesActive.Any())
+            {
+                StartLineDetonation(tickCounter);
+                return;
+            }
+            if (bombInGame)
+            {
+                StartBomb(tickCounter); 
+                return;
+            }
             if (dieGameObjects.Any()) StartDestroy(tickCounter);
-            if (linesActive.Any()) StartLineDetonation(tickCounter);
-            if (bombInGame) StartBomb(tickCounter);
         }
 
         if (State == GameState.Destroying) DestroyObject(tickCounter);
         if (State == GameState.Dropping) DropObjects(tickCounter);
         if (State == GameState.Swapping) SwapObjects(tickCounter);
-        if (State == GameState.AfterSwap) StartDestroy(tickCounter);
+        if (State == GameState.AfterAction) StartDestroy(tickCounter);
         if (State == GameState.BombAnimating) BombAnimation(tickCounter);
         if (State == GameState.LineDetonation) LineDetionationAnimation(tickCounter);
     }
@@ -119,7 +148,7 @@ public static class GameObjectFactory
                 }
 
             linesActive.Clear();
-            State = GameState.AfterSwap;
+            StartBomb(tickCounter);
             tickAnimationEnd = -1;
         }
         else
@@ -225,7 +254,7 @@ public static class GameObjectFactory
             if (linesActive.Any())
                 StartLineDetonation(tickCounter);
             else
-                State = GameState.AfterSwap;
+                State = GameState.AfterAction;
         }
         else
         {
@@ -305,70 +334,7 @@ public static class GameObjectFactory
                     new(selectedObject)
                 };
 
-                (targetObjectX, targetObjectY) = targetObject.GetCoords();
-                (selectedObjectX, selectedObjectY) = selectedObject.GetCoords();
-
-                if (bonusGameObjects.Any())
-                {
-                    foreach (var bonusData in bonusStructureData)
-                    {
-                        (int x, int y) = bonusData.ElementToBonus.GetCoords();
-                        foreach (var bonus in bonusGameObjects)
-                            if (bonus.orientation_type == OrientationTypeDict["horizontal"])
-                            {
-                                if (checkCoordInLine(x, bonus.x, bonus.size) && bonus.y == y)
-                                {
-                                    if (bonus.size == 4)
-                                    {
-                                        bonusData.IsHorizontalBonus = true;
-                                    }
-                                    else if (bonus.size >= 5)
-                                    {
-                                        bonusData.IsBombBonus = true;
-                                    }
-
-                                    bonusData.IsHorizontalLineDestroy = true;
-                                }
-                            }
-                            else if (bonus.orientation_type == OrientationTypeDict["vertical"])
-                            {
-                                if (checkCoordInLine(y, bonus.y, bonus.size) && bonus.x == x)
-                                {
-                                    if (bonus.size == 4)
-                                    {
-                                        bonusData.IsVerticalBonus = true;
-                                    }
-                                    else if (bonus.size >= 5)
-                                    {
-                                        bonusData.IsBombBonus = true;
-                                    }
-
-                                    bonusData.IsVerticalLineDestroy = true;
-                                }
-                            }
-                    }
-
-                foreach (var bonusData in bonusStructureData)
-                        if ((bonusData.IsHorizontalLineDestroy && bonusData.IsVerticalLineDestroy) || bonusData.IsBombBonus)
-                        {
-                            dieGameObjects.Remove(bonusData.ElementToBonus);
-                            bonusData.ElementToBonus.ChangeToBomb(intBoard[bonusData.ElementToBonus.GetCoords().x, bonusData.ElementToBonus.GetCoords().y]);
-                            bombs.Add(bonusData.ElementToBonus);
-                            bombInGame = true;
-                        }
-                        else if (bonusData.IsVerticalBonus)
-                        {
-                            dieGameObjects.Remove(bonusData.ElementToBonus);
-                            bonusData.ElementToBonus.ChangeToLine(OrientationTypeDict["vertical"]);
-                            lines.Add(bonusData.ElementToBonus);
-                        }
-                        else if (bonusData.IsHorizontalBonus)
-                        {
-                            dieGameObjects.Remove(bonusData.ElementToBonus);
-                            bonusData.ElementToBonus.ChangeToLine(OrientationTypeDict["horizontal"]);
-                            lines.Add(bonusData.ElementToBonus);
-                        }
-                }
+                GenerateBonuses(bonusStructureData);
             }
             else
             {
@@ -386,7 +352,7 @@ public static class GameObjectFactory
             if (linesActive.Any())
                 StartLineDetonation(tickCounter);
             else
-                State = GameState.AfterSwap;
+                State = GameState.AfterAction;
         }
         else
         {
@@ -415,6 +381,126 @@ public static class GameObjectFactory
                 targetObject.MoveY(-animationSpeed);
             }
         }
+    }
+    
+    private static void GenerateBonuses(List<BonusData> bonusStructureData)
+    {
+        int intLinebonus = 4;
+        int intBombBonus = 5;
+        if (checkBonusGameObjects.Any())
+        {
+            foreach (var bonusData in bonusStructureData)
+            {
+                (int x, int y) = bonusData.ElementToBonus.GetCoords();
+
+                foreach (var bonus in checkBonusGameObjects)
+                {
+                    if (bonus.Orientation_type == OrientationTypeDict["horizontal"])
+                    {
+                        if (checkCoordInLine(x, bonus.X, bonus.Size) && bonus.Y == y)
+                        {
+                            if (bonus.Size == intLinebonus)
+                            {
+                                bonusData.IsHorizontalBonus = true;
+                            }
+                            else if (bonus.Size >= intBombBonus)
+                            {
+                                bonusData.IsBombBonus = true;
+                            }
+
+                            bonusData.IsHorizontalLineDestroy = true;
+                            bonusData.UsingCheckBonusGameObjects.Add(bonus);
+                        }
+                    }
+                    else if (bonus.Orientation_type == OrientationTypeDict["vertical"])
+                    {
+                        if (checkCoordInLine(y, bonus.Y, bonus.Size) && bonus.X == x)
+                        {
+                            if (bonus.Size == intLinebonus)
+                            {
+                                bonusData.IsVerticalBonus = true;
+                            }
+                            else if (bonus.Size >= intBombBonus)
+                            {
+                                bonusData.IsBombBonus = true;
+                            }
+
+                            bonusData.IsVerticalLineDestroy = true;
+                            bonusData.UsingCheckBonusGameObjects.Add(bonus);
+                        }
+                    }
+                }
+            }
+
+            Dictionary<CheckBonusGameObjects, BonusData> busyBonuses =
+                new Dictionary<CheckBonusGameObjects, BonusData>();
+
+            foreach (var bonusData in bonusStructureData)
+            {
+                foreach (var cbObject in bonusData.UsingCheckBonusGameObjects)
+                {
+                    if (busyBonuses.ContainsKey(cbObject))
+                    {
+                        BonusData checkingBonusData = busyBonuses[cbObject];
+                        if (isBomb(checkingBonusData))
+                        {
+                            if (isBomb(bonusData))
+                            {
+                                checkingBonusData = bonusData;
+                            }
+
+                            continue;
+                        }
+
+                        if (isLine(checkingBonusData))
+                        {
+                            if (isLine(bonusData))
+                                checkingBonusData = bonusData;
+                        }
+                    }
+                    else
+                    {
+                        busyBonuses[cbObject] = bonusData;
+                    }
+                }
+            }
+            HashSet<BonusData> bonusDataSet = new HashSet<BonusData>(busyBonuses.Values);
+
+            foreach (var bonusData in bonusDataSet)
+            {
+                if (isBomb(bonusData))
+                {
+                    dieGameObjects.Remove(bonusData.ElementToBonus);
+                    bonusData.ElementToBonus.ChangeToBomb(intBoard[bonusData.ElementToBonus.GetCoords().x,
+                        bonusData.ElementToBonus.GetCoords().y]);
+                    bombs.Add(bonusData.ElementToBonus);
+                    bombInGame = true;
+                }
+                else if (bonusData.IsVerticalBonus)
+                {
+                    dieGameObjects.Remove(bonusData.ElementToBonus);
+                    bonusData.ElementToBonus.ChangeToLine(OrientationTypeDict["vertical"]);
+                    lines.Add(bonusData.ElementToBonus);
+                }
+                else if (bonusData.IsHorizontalBonus)
+                {
+                    dieGameObjects.Remove(bonusData.ElementToBonus);
+                    bonusData.ElementToBonus.ChangeToLine(OrientationTypeDict["horizontal"]);
+                    lines.Add(bonusData.ElementToBonus);
+                }
+            }
+        }
+        
+    }
+
+    public static bool isBomb(BonusData bonusData)
+    {
+        return (bonusData.IsHorizontalLineDestroy && bonusData.IsVerticalLineDestroy) || bonusData.IsBombBonus;
+    }
+    
+    public static bool isLine(BonusData bonusData)
+    {
+        return (bonusData.IsHorizontalBonus || bonusData.IsVerticalBonus);
     }
 
     public static void CheckAndSwapWithSelected(GameObjectClass firstElement, GameObjectClass SecondElement)
@@ -445,7 +531,9 @@ public static class GameObjectFactory
     private static List<List<(int, int)>> dropMatrix;
     private static int currentDropIds;
     private static int animationSpeed;
-
+    private static List<BonusData> dropBonusStructureData = new List<BonusData>();
+    
+    
     private static void DropObjects(int tickCounter)
     {
         if (dropMatrix.Count > 0)
@@ -458,17 +546,21 @@ public static class GameObjectFactory
                     for (var i = gameObjectCoords.Item2; i > 0; i--)
                     {
                         currentGameObject = gameObjectBoard[gameObjectCoords.Item1, i - 1];
+                        dropBonusStructureData.Add(new BonusData(currentGameObject));
                         gameObjectBoard[gameObjectCoords.Item1, i] = currentGameObject;
                         intBoard[gameObjectCoords.Item1, i] = intBoard[gameObjectCoords.Item1, i - 1];
                         currentGameObject.ChangeCoords(gameObjectCoords.Item1, i);
                     }
 
                     var newGameObjectClass = GameHelper.getRandomNumber();
-
+                    
                     intBoard[gameObjectCoords.Item1, 0] = newGameObjectClass;
 
-                    gameObjectBoard[gameObjectCoords.Item1, 0] =
+                    var newGameObject =
                         CreateGameObjectByIndexType(newGameObjectClass, gameCanvas, gameObjectCoords.Item1, -1);
+                    dropBonusStructureData.Add(new BonusData(newGameObject));
+                    
+                    gameObjectBoard[gameObjectCoords.Item1, 0] = newGameObject;
                     gameObjectBoard[gameObjectCoords.Item1, 0].ChangeCoords(gameObjectCoords.Item1, 0);
                 }
 
@@ -494,6 +586,8 @@ public static class GameObjectFactory
         }
         else
         {
+            CheckDestroy();
+            GenerateBonuses(dropBonusStructureData);
             State = GameState.Idle;
         }
     }
@@ -543,6 +637,7 @@ public static class GameObjectFactory
             }
 
             dieGameObjects.Clear();
+            dropBonusStructureData.Clear();
             State = GameState.Dropping;
             GenerateDropMatrix();
         }
@@ -562,7 +657,7 @@ public static class GameObjectFactory
     {
         if (gameObjectBoard == null) return;
 
-        bonusGameObjects.Clear();
+        checkBonusGameObjects.Clear();
         dieGameObjects.Clear();
 
         CheckOrientationDestroy(true);
@@ -594,10 +689,10 @@ public static class GameObjectFactory
                     if (currentTypeCount >= 3)
                     {
                         if (isHorizontal)
-                            bonusGameObjects.Add((j - 1, i, currentTypeCount,
+                            checkBonusGameObjects.Add(new (j - 1, i, currentTypeCount,
                                 OrientationTypeDict["horizontal"], lastElementType));
                         else
-                            bonusGameObjects.Add((i, j - 1, currentTypeCount,
+                            checkBonusGameObjects.Add(new (i, j - 1, currentTypeCount,
                                 OrientationTypeDict["vertical"], lastElementType));
                     }
 
@@ -631,10 +726,10 @@ public static class GameObjectFactory
             if (currentTypeCount >= 3)
             {
                 if (isHorizontal)
-                    bonusGameObjects.Add((GameConfig.BoardSize - 1, i, currentTypeCount,
+                    checkBonusGameObjects.Add(new (GameConfig.BoardSize - 1, i, currentTypeCount,
                         OrientationTypeDict["horizontal"], lastElementType));
                 else
-                    bonusGameObjects.Add((i, GameConfig.BoardSize - 1, currentTypeCount,
+                    checkBonusGameObjects.Add(new (i, GameConfig.BoardSize - 1, currentTypeCount,
                         OrientationTypeDict["vertical"], lastElementType));
             }
         }
