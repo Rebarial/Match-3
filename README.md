@@ -1,7 +1,3 @@
-Сборка .net, тестировалось на windows: [match-3.zip](https://github.com/user-attachments/files/25913527/match-3.zip)
-
-
-
 Тестовое задание для кандидата на должность
 программиста в Гейм Форест
 Задача:
