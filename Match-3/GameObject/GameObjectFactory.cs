@@ -10,10 +10,17 @@ public class BonusData
     public GameObjectClass ElementToBonus { get; set; }
     public bool IsHorizontalBonus { get; set; }
     public bool IsVerticalBonus { get; set; }
+    
+    public bool IsBombBonus { get; set; }
 
     public bool IsVerticalLineDestroy { get; set; }
 
     public bool IsHorizontalLineDestroy { get; set; }
+    
+    public BonusData(GameObjectClass elementToBonus)
+    {
+        ElementToBonus = elementToBonus;
+    }
 }
 
 public static class GameObjectFactory
@@ -294,22 +301,8 @@ public static class GameObjectFactory
 
                 var bonusStructureData = new List<BonusData>
                 {
-                    new()
-                    {
-                        ElementToBonus = targetObject,
-                        IsHorizontalBonus = false,
-                        IsVerticalBonus = false,
-                        IsHorizontalLineDestroy = false,
-                        IsVerticalLineDestroy = false
-                    },
-                    new()
-                    {
-                        ElementToBonus = selectedObject,
-                        IsHorizontalBonus = false,
-                        IsVerticalBonus = false,
-                        IsHorizontalLineDestroy = false,
-                        IsVerticalLineDestroy = false
-                    }
+                    new(targetObject),
+                    new(selectedObject)
                 };
 
                 (targetObjectX, targetObjectY) = targetObject.GetCoords();
@@ -317,74 +310,46 @@ public static class GameObjectFactory
 
                 if (bonusGameObjects.Any())
                 {
-                    foreach (var bonus in bonusGameObjects)
-                        if (bonus.orientation_type == OrientationTypeDict["horizontal"])
-                        {
-                            if (checkCoordInLine(targetObjectX, bonus.x, bonus.size) && bonus.y == targetObjectY)
-                            {
-                                if (bonus.size == 4)
-                                {
-                                    bonusStructureData[0].IsHorizontalBonus = true;
-                                }
-                                else if (bonus.size >= 5)
-                                {
-                                    bonusStructureData[0].IsHorizontalLineDestroy = true; //для условия бомбы
-                                    bonusStructureData[0].IsVerticalLineDestroy = true;
-                                }
-
-                                bonusStructureData[0].IsHorizontalLineDestroy = true;
-                            }
-
-                            if (checkCoordInLine(selectedObjectX, bonus.x, bonus.size) && bonus.y == selectedObjectY)
-                            {
-                                if (bonus.size == 4)
-                                {
-                                    bonusStructureData[1].IsHorizontalBonus = true;
-                                }
-                                else if (bonus.size >= 5)
-                                {
-                                    bonusStructureData[1].IsHorizontalLineDestroy = true; //для условия бомбы
-                                    bonusStructureData[1].IsVerticalLineDestroy = true;
-                                }
-
-                                bonusStructureData[1].IsHorizontalLineDestroy = true;
-                            }
-                        }
-                        else if (bonus.orientation_type == OrientationTypeDict["vertical"])
-                        {
-                            if (checkCoordInLine(targetObjectY, bonus.y, bonus.size) && bonus.x == targetObjectX)
-                            {
-                                if (bonus.size == 4)
-                                {
-                                    bonusStructureData[0].IsVerticalBonus = true;
-                                }
-                                else if (bonus.size >= 5)
-                                {
-                                    bonusStructureData[0].IsHorizontalLineDestroy = true; //для условия бомбы
-                                    bonusStructureData[0].IsVerticalLineDestroy = true;
-                                }
-
-                                bonusStructureData[0].IsVerticalLineDestroy = true;
-                            }
-
-                            if (checkCoordInLine(selectedObjectY, bonus.y, bonus.size) && bonus.x == selectedObjectX)
-                            {
-                                if (bonus.size == 4)
-                                {
-                                    bonusStructureData[1].IsVerticalBonus = true;
-                                }
-                                else if (bonus.size >= 5)
-                                {
-                                    bonusStructureData[1].IsHorizontalLineDestroy = true; //для условия бомбы
-                                    bonusStructureData[1].IsVerticalLineDestroy = true;
-                                }
-
-                                bonusStructureData[1].IsVerticalLineDestroy = true;
-                            }
-                        }
-
                     foreach (var bonusData in bonusStructureData)
-                        if (bonusData.IsHorizontalLineDestroy && bonusData.IsVerticalLineDestroy)
+                    {
+                        (int x, int y) = bonusData.ElementToBonus.GetCoords();
+                        foreach (var bonus in bonusGameObjects)
+                            if (bonus.orientation_type == OrientationTypeDict["horizontal"])
+                            {
+                                if (checkCoordInLine(x, bonus.x, bonus.size) && bonus.y == y)
+                                {
+                                    if (bonus.size == 4)
+                                    {
+                                        bonusData.IsHorizontalBonus = true;
+                                    }
+                                    else if (bonus.size >= 5)
+                                    {
+                                        bonusData.IsBombBonus = true;
+                                    }
+
+                                    bonusData.IsHorizontalLineDestroy = true;
+                                }
+                            }
+                            else if (bonus.orientation_type == OrientationTypeDict["vertical"])
+                            {
+                                if (checkCoordInLine(y, bonus.y, bonus.size) && bonus.x == x)
+                                {
+                                    if (bonus.size == 4)
+                                    {
+                                        bonusData.IsVerticalBonus = true;
+                                    }
+                                    else if (bonus.size >= 5)
+                                    {
+                                        bonusData.IsBombBonus = true;
+                                    }
+
+                                    bonusData.IsVerticalLineDestroy = true;
+                                }
+                            }
+                    }
+
+                foreach (var bonusData in bonusStructureData)
+                        if ((bonusData.IsHorizontalLineDestroy && bonusData.IsVerticalLineDestroy) || bonusData.IsBombBonus)
                         {
                             dieGameObjects.Remove(bonusData.ElementToBonus);
                             bonusData.ElementToBonus.ChangeToBomb(intBoard[bonusData.ElementToBonus.GetCoords().x, bonusData.ElementToBonus.GetCoords().y]);
