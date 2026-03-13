@@ -37,6 +37,8 @@ public partial class Game : Window
         GameConfig.BoardSize = 8;
         GameArea.Children.Add(GameObjectFactory.GenerateDesk());
         Grid.SetZIndex(CenterStackPanel, 10);
+
+        Score = 0;
     }
 
 
@@ -54,7 +56,7 @@ public partial class Game : Window
     private int tickCounter;
     private int timeOfGameLeft = 60;
 
-    public static int Score = 0;
+    public static int Score;
 
     private void Update(object sender, EventArgs e)
     {
