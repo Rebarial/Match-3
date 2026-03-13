@@ -446,7 +446,7 @@ public static class GameObjectFactory
                         {
                             if (isBomb(bonusData))
                             {
-                                checkingBonusData = bonusData;
+                                busyBonuses[cbObject] = bonusData;
                             }
 
                             continue;
@@ -455,7 +455,7 @@ public static class GameObjectFactory
                         if (isLine(checkingBonusData))
                         {
                             if (isLine(bonusData))
-                                checkingBonusData = bonusData;
+                                busyBonuses[cbObject] = bonusData;
                         }
                     }
                     else
