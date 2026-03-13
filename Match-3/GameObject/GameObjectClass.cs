@@ -168,14 +168,36 @@ public abstract class GameObjectClass : GameObjectInterface
         var resourceName = $"Match_3.GameObject.Sprites.{SpriteType}.{DefaultSpriteName}_{SpriteType}_{typeString}.png";
         Element.Children.OfType<Image>().FirstOrDefault().Source = GameHelper.LoadImageFromResource(resourceName);
     }
+    
+    private Color[] colorMassive =
+    {
+        Colors.White,
+        Colors.Blue,
+        Colors.Green,
+        Colors.Orange,
+        Colors.Pink,
+        Colors.Red
+    };
 
-    public void ChangeToBomb()
+    public void ChangeToBomb(int colorIndex)
     {
         if (Element.Children.OfType<Image>().FirstOrDefault() == null) return;
 
         isBomb = true;
+        var image = Element.Children.OfType<Image>().FirstOrDefault();
         var resourceName = "Match_3.GameObject.Sprites.bonuses.bomb.png";
-        Element.Children.OfType<Image>().FirstOrDefault().Source = GameHelper.LoadImageFromResource(resourceName);
+        image.Source = GameHelper.LoadImageFromResource(resourceName);
+        
+        var textBlock = new TextBlock();
+        textBlock.Text = "Color";
+        textBlock.Foreground = new SolidColorBrush(colorMassive[colorIndex]);
+        textBlock.FontSize = 20;
+        textBlock.FontWeight = FontWeights.Bold;
+        textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+        textBlock.VerticalAlignment = VerticalAlignment.Center;
+        textBlock.TextWrapping = TextWrapping.Wrap;
+
+        Element.Children.Add(textBlock);
     }
 
     public int GetOreintationType()

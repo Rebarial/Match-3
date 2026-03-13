@@ -387,7 +387,7 @@ public static class GameObjectFactory
                         if (bonusData.IsHorizontalLineDestroy && bonusData.IsVerticalLineDestroy)
                         {
                             dieGameObjects.Remove(bonusData.ElementToBonus);
-                            bonusData.ElementToBonus.ChangeToBomb();
+                            bonusData.ElementToBonus.ChangeToBomb(intBoard[bonusData.ElementToBonus.GetCoords().x, bonusData.ElementToBonus.GetCoords().y]);
                             bombs.Add(bonusData.ElementToBonus);
                             bombInGame = true;
                         }
